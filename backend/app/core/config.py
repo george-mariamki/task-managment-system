@@ -5,6 +5,10 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Task Management System"
     API_V1_STR: str = "/api/v1"
     
+    # Sicherheit
+    SECRET_KEY: str = "CHANGE_THIS_IN_PRODUCTION_SUPER_SECRET_KEY"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 Tage
+    
     # Datenbank-Konfiguration (SQLite für Entwicklung)
     # Wir verwenden eine lokale Datei 'sql_app.db' im Hauptverzeichnis
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///./sql_app.db"
