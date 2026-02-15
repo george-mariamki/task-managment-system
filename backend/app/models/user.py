@@ -1,5 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String
 from app.db.base_class import Base
+from sqlalchemy.orm import relationship
 
 class User(Base):
     # Primärschlüssel und Indexierung für schnelle Abfragen
@@ -16,3 +17,5 @@ class User(Base):
     
     # Admin-Rechte für zukünftige Erweiterungen
     is_superuser = Column(Boolean, default=False)
+
+    tasks = relationship("Task", back_populates="owner")
