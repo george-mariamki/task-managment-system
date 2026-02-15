@@ -1,10 +1,21 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.api.api_v1.api import api_router
 from app.core.config import settings
+from app.db.session import engine
+from app.db.base import Base
+
+# Lifespan-Event für Datenbank-Initialisierung
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Erstellt alle Tabellen beim Start
+    Base.metadata.create_all(bind=engine)
+    yield
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan  # Hier binden wir das Event
 )
 
 # Router einbinden
