@@ -2,10 +2,7 @@ import axios from 'axios';
 
 // API-Instanz erstellen
 const api = axios.create({
-    baseURL: 'http://localhost:8000', // Basis-URL des Backends
-    headers: {
-        'Content-Type': 'application/json',
-    }
+    baseURL: 'http://localhost:8000/api/v1', // Basis-URL des Backends
 });
 
 // Request-Interceptor: Token hinzufügen 

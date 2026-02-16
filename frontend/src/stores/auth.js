@@ -17,28 +17,35 @@ export const useAuthStore = defineStore('auth', () => {
     // 1. Login-Funktion 
     const login = async (email, password) => {
         try {
-            // Anfrage an das Backend senden (form-urlencoded für OAuth2)
-            const formData = new FormData();
-            formData.append('username', email);
-            formData.append('password', password);
+            // Nutzung von URLSearchParams für application/x-www-form-urlencoded Format
+            // Dies ist zwingend erforderlich für OAuth2PasswordRequestForm im Backend
+            const params = new URLSearchParams();
+            params.append('username', email);
+            params.append('password', password);
 
-            const response = await api.post('/token', formData);
-            
+            // Anfrage senden
+            const response = await api.post('/login/access-token', params);    
+
             // Token speichern
             token.value = response.data.access_token;
             localStorage.setItem('token', token.value);
             
-            // Benutzerdaten abrufen (nach erfolgreichem Login)
+            // Benutzerprofil laden
             await fetchUser();
             
             // Weiterleitung zum Dashboard
             router.push('/dashboard');
+            
             return { success: true };
         } catch (error) {
             console.error('Login error:', error);
-            return { success: false, error: error.response?.data?.detail || 'Login fehlgeschlagen' };
+            return { 
+                success: false, 
+                error: error.response?.data?.detail || 'Anmeldung fehlgeschlagen' 
+            };
         }
     };
+
 
     // 2. Benutzerdaten abrufen 
     const fetchUser = async () => {
