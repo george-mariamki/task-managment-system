@@ -94,6 +94,20 @@ export const useTaskStore = defineStore('task', () => {
         }
     };
 
+    // 6. Anhang löschen (DELETE /attachments/{id})
+    const deleteAttachment = async (attachmentId) => {
+        try {
+            await api.delete(`/attachments/${attachmentId}`);
+            // Wir müssen die Aufgaben neu laden, um die UI zu aktualisieren
+            // oder (besser) wir entfernen den Anhang lokal aus dem State, aber Reload ist sicherer
+            await fetchTasks(); 
+            return { success: true };
+        } catch (err) {
+            console.error('Fehler beim Löschen des Anhangs:', err);
+            return { success: false, error: err.response?.data?.detail };
+        }
+    };
+
     return { 
         tasks, 
         isLoading, 
@@ -102,6 +116,7 @@ export const useTaskStore = defineStore('task', () => {
         createTask, 
         updateTask, 
         deleteTask,
-        uploadFile
+        uploadFile,
+        deleteAttachment
     };
 });
