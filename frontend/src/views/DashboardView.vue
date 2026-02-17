@@ -46,6 +46,7 @@
         :task="task" 
         @edit="openEditModal"
         @delete="confirmDelete"
+        @delete-attachment="handleDeleteAttachment" 
       />
       
       <!-- Empty State -->
@@ -143,6 +144,20 @@ const handleSaveTask = async (formData) => {
 const confirmDelete = async (id) => {
   if (confirm('Möchten Sie diese Aufgabe wirklich löschen?')) {
     await taskStore.deleteTask(id);
+  }
+};
+
+// Anhang löschen
+const handleDeleteAttachment = async (attachmentId) => {
+  if (confirm('Möchten Sie diesen Anhang wirklich löschen?')) {
+    // API-Aufruf (direkt über axios oder besser: neue Action im Store)
+    try {
+      await api.delete(`/attachments/${attachmentId}`);
+      // UI aktualisieren: Task neu laden (einfachste Lösung)
+      await taskStore.fetchTasks(); 
+    } catch (error) {
+      alert('Fehler beim Löschen des Anhangs: ' + (error.response?.data?.detail || 'Unbekannt'));
+    }
   }
 };
 </script>
