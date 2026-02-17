@@ -55,6 +55,28 @@
           </label>
         </div>
 
+        <!-- Datei Upload Feld -->
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="file">
+            Anhang (Optional)
+          </label>
+          <input 
+            @change="handleFileChange"
+            id="file" 
+            type="file" 
+            class="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+          >
+          <!-- Zeige ausgewählten Dateinamen -->
+          <p v-if="selectedFile" class="mt-2 text-sm text-gray-600">
+            Ausgewählt: {{ selectedFile.name }}
+          </p>
+        </div>
+
         <!-- Buttons -->
         <div class="flex justify-end space-x-3 mt-6">
           <button 
@@ -79,6 +101,7 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue';
+import { useTaskStore } from '../stores/task';
 
 // Props: Task-Daten (optional für Edit) und Loading-Status
 const props = defineProps({
@@ -121,8 +144,51 @@ watch(() => props.taskToEdit, (newTask) => {
 }, { immediate: true });
 
 // Formular absenden
-const handleSubmit = () => {
+//const handleSubmit = () => {
   // Daten an Eltern-Komponente senden (DashboardView)
-  emit('save', { ...form });
+ // emit('save', { ...form });
+//};
+
+// Store nutzen
+const taskStore = useTaskStore();
+
+// Neuer State für Datei
+const selectedFile = ref(null);
+
+// Datei-Auswahl Handler
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    selectedFile.value = file;
+  }
 };
+
+// Update handleSubmit
+const handleSubmit = async () => {
+  let attachmentId = null;
+
+  // 1. Wenn Datei ausgewählt, zuerst hochladen
+  if (selectedFile.value) {
+    const uploadResult = await taskStore.uploadFile(selectedFile.value);
+    if (uploadResult.success) {
+        attachmentId = uploadResult.data.id; // ID vom Backend erhalten
+    } else {
+        alert('Fehler beim Dateiupload: ' + uploadResult.error);
+        return; // Abbrechen
+    }
+  }
+
+  // 2. Daten vorbereiten (mit Attachment ID wenn vorhanden)
+  const taskData = { ...form };
+  if (attachmentId) {
+      taskData.attachment_ids = [attachmentId]; // Backend erwartet Liste von IDs
+  }
+
+  // 3. An Eltern-Komponente senden
+  emit('save', taskData);
+  
+  // Reset
+  selectedFile.value = null;
+};
+
 </script>

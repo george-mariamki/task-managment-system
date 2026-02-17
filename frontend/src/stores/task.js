@@ -78,6 +78,22 @@ export const useTaskStore = defineStore('task', () => {
         }
     };
 
+    // 5. Datei hochladen (POST /upload/)
+    const uploadFile = async (file) => {
+        // FormData erstellen (für Datei-Upload zwingend erforderlich)
+        const formData = new FormData();
+        formData.append('file', file); // 'file' muss mit Backend-Parameter übereinstimmen
+
+        try {
+            // Wichtig: Content-Type nicht manuell setzen, Axios macht das bei FormData automatisch
+            const response = await api.post('/upload/', formData);
+            return { success: true, data: response.data }; // Gibt { id: ..., filename: ... } zurück
+        } catch (err) {
+            console.error('Fehler beim Hochladen:', err);
+            return { success: false, error: err.response?.data?.detail || 'Upload fehlgeschlagen' };
+        }
+    };
+
     return { 
         tasks, 
         isLoading, 
@@ -85,6 +101,7 @@ export const useTaskStore = defineStore('task', () => {
         fetchTasks, 
         createTask, 
         updateTask, 
-        deleteTask 
+        deleteTask,
+        uploadFile
     };
 });
