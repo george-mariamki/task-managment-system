@@ -10,7 +10,7 @@
       <div class="flex space-x-4">
         <!-- Neue Aufgabe Button -->
         <button 
-          @click="showCreateModal = true"
+          @click="openCreateModal"
           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow transition"
         >
           + Neue Aufgabe
@@ -27,7 +27,7 @@
     </header>
 
     <!-- Loading State -->
-    <div v-if="taskStore.isLoading" class="text-center py-12">
+    <div v-if="taskStore.isLoading && !taskStore.tasks.length" class="text-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
       <p class="mt-4 text-gray-500">Lade Aufgaben...</p>
     </div>
@@ -51,9 +51,18 @@
       <!-- Empty State -->
       <div v-if="taskStore.tasks.length === 0" class="col-span-full text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
         <p class="text-gray-500 text-lg">Keine Aufgaben gefunden.</p>
-        <button @click="showCreateModal = true" class="mt-4 text-blue-600 hover:underline">Erstellen Sie Ihre erste Aufgabe!</button>
+        <button @click="openCreateModal" class="mt-4 text-blue-600 hover:underline">Erstellen Sie Ihre erste Aufgabe!</button>
       </div>
     </div>
+
+    <!-- Modal für Erstellen/Bearbeiten -->
+    <TaskModal 
+      v-if="showModal" 
+      :taskToEdit="currentTask" 
+      :isLoading="taskStore.isLoading"
+      @close="closeModal"
+      @save="handleSaveTask"
+    />
   </div>
 </template>
 
@@ -62,6 +71,7 @@ import { onMounted, ref } from 'vue';
 import { useTaskStore } from '../stores/task';
 import { useAuthStore } from '../stores/auth';
 import TaskCard from '../components/TaskCard.vue';
+import TaskModal from '../components/TaskModal.vue';
 import { useRouter } from 'vue-router';
 
 // Stores initialisieren
@@ -69,11 +79,12 @@ const taskStore = useTaskStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
-// Lokaler State für UI (Modal Steuerung kommt später)
-const showCreateModal = ref(false);
+// Lokaler State für UI
+const showModal = ref(false); // Modal Sichtbarkeit
+const currentTask = ref(null); // Aktuelle Aufgabe zum Bearbeiten (null = neu)
 const user = authStore.user;
 
-// Lifecycle Hook: Daten beim Laden der Komponente abrufen
+// Lifecycle Hook
 onMounted(() => {
   if (!authStore.isAuthenticated) {
     router.push('/login');
@@ -85,15 +96,50 @@ onMounted(() => {
 // Logout Handler
 const handleLogout = () => {
   authStore.logout();
-  router.push('/login'); // Zur Sicherheit
+  router.push('/login');
 };
 
-// Placeholder Funktionen für Events (Implementierung folgt)
+// --- Modal Logic ---
+
+// Öffnet das Modal für eine neue Aufgabe
+const openCreateModal = () => {
+  currentTask.value = null; // Reset für neue Aufgabe
+  showModal.value = true;
+};
+
+// Öffnet das Modal zum Bearbeiten einer existierenden Aufgabe
 const openEditModal = (task) => {
-  console.log('Edit task:', task);
-  // TODO: Modal öffnen
+  currentTask.value = task; // Task-Daten übergeben
+  showModal.value = true;
 };
 
+// Schließt das Modal
+const closeModal = () => {
+  showModal.value = false;
+  currentTask.value = null;
+};
+
+// Speichert die Aufgabe (Create oder Update)
+const handleSaveTask = async (formData) => {
+  let result;
+  
+  if (currentTask.value) {
+    // Update-Logik: ID der aktuellen Aufgabe nutzen
+    result = await taskStore.updateTask(currentTask.value.id, formData);
+  } else {
+    // Create-Logik: Neue Aufgabe erstellen
+    result = await taskStore.createTask(formData);
+  }
+
+  // Wenn erfolgreich, Modal schließen
+  if (result.success) {
+    closeModal();
+  } else {
+    alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+  }
+};
+
+// Löschen bestätigen
 const confirmDelete = async (id) => {
   if (confirm('Möchten Sie diese Aufgabe wirklich löschen?')) {
     await taskStore.deleteTask(id);
