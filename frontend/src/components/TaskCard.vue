@@ -80,9 +80,12 @@ const props = defineProps({
 const emit = defineEmits(['edit', 'delete', 'delete-attachment']);
 
 // Hilfsfunktion: URL für Datei generieren
+const origin = import.meta.env.VITE_BACKEND_ORIGIN || "http://localhost:8000";
+
 const getFileUrl = (filePath) => {
-  // Annahme: Backend serviert statische Dateien unter /static/ oder direkt
-  // Falls filePath relativ ist (z.B. "uploads/file.png"), BaseURL davor setzen
-  return `http://localhost:8000/${filePath}`; 
+  if (!filePath) return "#";
+  if (filePath.startsWith("http://") || filePath.startsWith("https://")) return filePath;
+  const p = filePath.startsWith("/") ? filePath : `/${filePath}`;
+  return `${origin}${p}`;
 };
 </script>

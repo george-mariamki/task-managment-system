@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API-Instanz erstellen
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api/v1', // Basis-URL des Backends
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1"
 });
 
 // Request-Interceptor: Token hinzufügen 

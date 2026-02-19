@@ -112,7 +112,6 @@
               <p class="text-xs text-gray-400 mt-1">
                 Maximale Größe: 5 MB
               </p>
-              </div>
 
             </button>
 
