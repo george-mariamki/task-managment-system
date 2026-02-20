@@ -1,4 +1,4 @@
-# Python
+# Python / Backend
 __pycache__/
 *.py[cod]
 *$py.class
@@ -11,36 +11,51 @@ ENV/
 dist/
 build/
 .pytest_cache/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/venv/
+backend/migrations/
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
 
-# Environment variables
+# Environment variables (ignore all, keep examples)
+
+frontend/.env*
+backend/.env*
 .env
 .env.local
+.env.development
+.env.production
+!backend/.env.example
+!frontend/.env.example
+
+# Frontend / Node.js / Vue
+node_modules/
+dist/
+.npm
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+uploads/
+
+# Docker
+docker-compose.override.yml
 
 # IDEs
 .vscode/
+.vscode/settings.json
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# OS generated
 .DS_Store
 Thumbs.db
-
-# Node.js / Vue
-node_modules/
-dist/
-.npm
-*.log
-
-# Uploads (سنضيف مجلد للملفات المرفوعة)
-backend/uploads/*
-!backend/uploads/.gitkeep
-
-# Docker
-*.log
