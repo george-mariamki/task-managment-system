@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Backend-Service (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # verbindung des Codes für Live-Reloading
+      - ./backend:/app
+      # prevent deletion of __pycache__ inside the container when bind mounting
+      - /app/__pycache__
+      # uploads_data volume für persistente Speicherung von hochgeladenen Dateien
+      - uploads_data:/app/uploads
+      # db_data volume für persistente Speicherung der SQLite-Datenbank
+      - db_data:/app/sql_app.db_folder
+
+    # environment variables: zuerst aus env_file, dann können sie hier überschrieben werden
+    env_file:
+      - ./backend/.env.example
+      - ./backend/.env.development
+
+    # (optional) any environment variables here will override those in env_file
+    environment:
+      - SECRET_KEY=YOUR_SUPER_SECRET_KEY_CHANGE_IN_PRODUCTION
+      - SQLALCHEMY_DATABASE_URI=sqlite:///./sql_app.db_folder/sql_app.db
+
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Frontend-Service (Vue.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: task_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      # Verbindung des Codes für Live-Reloading
+      - ./frontend:/app
+      # prevent deletion of node_modules inside the container when bind mounting
+      - /app/node_modules
+    environment:
+      # RAPID URL für den API-Zugriff vom Frontend (über den Browser)
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+# netzwerkdefinition für die Kommunikation zwischen den Containern
+networks:
+  app-network:
+    driver: bridge
+
+# volumes für persistente Daten (Uploads und SQLite-Datenbank)
+volumes:
+  uploads_data:
+  db_data:
