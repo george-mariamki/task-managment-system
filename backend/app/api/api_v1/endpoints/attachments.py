@@ -11,6 +11,18 @@ from app.utils.storage import disk_path_from_attachment_value
 router = APIRouter()
 
 
+@router.get("/my-files/", tags=["attachments"])
+def list_user_files(
+    current_user: models.User = Depends(deps.get_current_user),
+    db: Session = Depends(deps.get_db)
+):
+    """List current user's attachments"""
+    attachments = crud.attachment.get_multi(db=db)  # أو filter by user/tasks
+    return [
+        {"id": a.id, "filename": a.filename, "url": f"{a.file_path}"}
+        for a in attachments if a.task and a.task.owner_id == current_user.id
+    ]
+
 @router.delete("/{id}", response_model=schemas.AttachmentOut)
 def delete_attachment(
     db: Session = Depends(deps.get_db),
