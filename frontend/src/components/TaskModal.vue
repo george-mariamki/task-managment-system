@@ -94,7 +94,7 @@
               type="file" 
               multiple 
               class="hidden"
-              accept="image/*,.pdf,.doc,.docx,.txt"
+              :accept="acceptValue"
             >
             
             <!-- Custom Upload Button -->
@@ -107,10 +107,10 @@
                 Klicken zum Auswählen oder Dateien hierher ziehen
               </span>
               <p class="text-xs text-gray-400 mt-1">
-                Erlaubte Formate: JPG, PNG, GIF, PDF, DOC, DOCX, TXT
+                Erlaubte Formate: {{ allowedExts.join(', ') }}
               </p>
               <p class="text-xs text-gray-400 mt-1">
-                Maximale Größe: 5 MB
+                Maximale Größe: {{ maxSizeMB }}MB
               </p>
 
             </button>
@@ -178,8 +178,29 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, computed  } from 'vue';
 import { useTaskStore } from '../stores/task';
+
+const maxSizeMB = parseInt(import.meta.env.VITE_UPLOAD_MAX_SIZE_MB || '5')
+const rawExts = import.meta.env.VITE_UPLOAD_ALLOWED_EXTS || '[".jpg",".jpeg",".png",".gif",".pdf",".doc",".docx",".txt"]'
+//const allowedExts = ref(allowedExtsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean))
+
+const parseExts = (raw) => {
+  if (!raw) return []
+  try {
+    const arr = JSON.parse(raw)
+    if (Array.isArray(arr)) {
+      return arr.map(e => String(e).trim().toLowerCase()).filter(Boolean)
+    }
+  } catch (e) {
+    // fallback: ".jpg,.png" → split(',')
+    return raw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+  }
+  return []
+}
+
+const allowedExts = ref(parseExts(rawExts))
+const acceptValue = computed(() => allowedExts.value.join(','))
 
 // Props
 const props = defineProps({
@@ -235,44 +256,42 @@ const handleFileSelect = (event) => {
   const newFiles = Array.from(event.target.files);
   
   // Konfiguration für erlaubte Dateien
-  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-  
+  //const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+  //const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+  const MAX_SIZE_BYTES = maxSizeMB * 1024 * 1024; // 5MB 
   const validFiles = [];
   const invalidFiles = [];
 
   // Validierungsschleife
   newFiles.forEach(file => {
-    // Check 1: Dateityp
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      invalidFiles.push(`${file.name} (Ungültiges Format)`);
-      return;
-    }
-    // Check 2: Dateigröße
-    if (file.size > MAX_SIZE) {
-      invalidFiles.push(`${file.name} (Zu groß > 5MB)`);
-      return;
-    }
-    // Check 3: Duplikate vermeiden
-    const isDuplicate = pendingFiles.value.some(existing => existing.name === file.name && existing.size === file.size);
-    if (isDuplicate) {
-      // Optional: Man könnte Duplikate auch als Fehler melden oder stillschweigend ignorieren
-      return; 
+    //  Extension validation (wie Backend!)
+    const fileExt = file.name.split('.').pop()?.toLowerCase()
+    if (!allowedExts.value.includes('.' + fileExt)) {
+      invalidFiles.push(`${file.name}: Ungültiges Format`)
+      return
     }
 
-    validFiles.push(file);
+    // Check 2: Dateigröße
+    if (file.size > MAX_SIZE_BYTES) {
+      invalidFiles.push(`${file.name}: Zu groß`)
+      return
+    }
+
+    // Check 3: Duplikate vermeiden
+  const isDuplicate = pendingFiles.value.some(f => f.name === file.name && f.size === file.size)
+    if (isDuplicate) return
+
+    validFiles.push(file)
   });
+
 
   // Erfolgreiche Dateien hinzufügen
   if (validFiles.length > 0) {
     pendingFiles.value = [...pendingFiles.value, ...validFiles];
   }
-
-  // Fehlermeldung anzeigen für ungültige Dateien
   if (invalidFiles.length > 0) {
-    fileError.value = `Nicht hinzugefügt: ${invalidFiles.join(', ')}`;
-    // Fehler nach 5 Sekunden ausblenden
-    setTimeout(() => { fileError.value = ''; }, 5000);
+    fileError.value = invalidFiles.join('; ')
+    setTimeout(() => fileError.value = '', 5000)
   }
 
   event.target.value = ''; // Reset Input
