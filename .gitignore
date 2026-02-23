@@ -1,61 +1,123 @@
-# Python / Backend
+# ============================================
+# Root Level .gitignore
+# ============================================
+
+# Environment Variables (ignore all, keep examples)
+.env
+.env.*
+!.env.example
+backend/.env*
+!backend/.env.example
+frontend/.env*
+!frontend/.env.example
+
+# Python / Backend (general)
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+*.egg-info/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# Virtual Environments
 venv/
 env/
 ENV/
-*.egg-info/
-dist/
-build/
-.pytest_cache/
-backend/__pycache__/
-backend/.pytest_cache/
+.venv/
 backend/venv/
-backend/migrations/
+backend/env/
 
-# Database
+# Database Files
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
+backend/sql_app.db
+backend/sqlapp.db
+backend/sql_app.db_folder/
 
-# Environment variables (ignore all, keep examples)
-
-frontend/.env*
-backend/.env*
-.env
-.env.local
-.env.development
-.env.production
-!backend/.env.example
-!frontend/.env.example
-
-# Frontend / Node.js / Vue
+# Frontend / Node.js (general)
 node_modules/
-dist/
 .npm
+.yarn/
+.pnp/
+.pnp.js
 frontend/node_modules/
-frontend/dist/
-frontend/.vite/
 
-# Uploads
+# Build outputs
+dist/
+build/
+*.egg
+backend/dist/
+backend/build/
+frontend/dist/
+frontend/dist-ssr/
+
+# Uploads (keep directory structure)
 backend/uploads/*
 !backend/uploads/.gitkeep
-uploads/
+uploads/*
+!uploads/.gitkeep
 
 # Docker
 docker-compose.override.yml
+.dockerignore
 
-# IDEs
+# IDEs and Editors
 .vscode/
-.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/settings.json.example
 .idea/
 *.swp
 *.swo
 *~
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
 
-# OS generated
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.coverage.*
+coverage/
+.nyc_output/
+
+# Misc
+*.pyc
+*.pyo
+*.pyd
+.cache/
