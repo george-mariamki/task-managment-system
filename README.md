@@ -177,10 +177,15 @@ The easiest way to get started is using Docker Compose:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/george-mariamki/task-managment-system
 cd task-management-system
 
 # Start all services
+# Note: By default, Docker Compose automatically loads the default environment variables 
+# from the example files:
+# - Backend: `.backend/.env.example`
+# - Frontend: `.frontend/.env.example`
+
 docker-compose up --build
 
 # The application will be available at:
@@ -210,8 +215,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Set environment variables (create .env.development file)
-# Copy .env.example to .env.development and configure
-# Optional
+
+# OPTIONAL:
+# If you want to experiment with custom environment variable values,
+# first modify them inside `.env.example`,
+# then run the following command to copy them into the development config:
+
 cp .env.example .env.development
 
 # Run the application
@@ -228,8 +237,12 @@ cd frontend
 npm install
 
 # Set environment variables (create .env.development file)
-# VITE_API_URL=http://localhost:8000
-# Optional
+
+# OPTIONAL:
+# If you want to experiment with custom environment variable values,
+# first modify them inside `.env.example`,
+# then run the following command to copy them into the development config:
+
 cp .env.example .env.development
 
 # Run development server
@@ -263,7 +276,7 @@ CORS_ORIGINS=["http://localhost:5173", "http://127.0.0.1:5173"]
 UPLOAD_DIR="uploads"
 UPLOAD_PUBLIC_PREFIX="/uploads"
 UPLOAD_ALLOWED_EXTENSIONS=[".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx", ".txt"]
-UPLOAD_MAX_SIZE_BYTES=5242880
+UPLOAD_MAX_SIZE_MB=5
 ```
 
 #### Frontend (.env)
@@ -291,8 +304,9 @@ Once the backend is running, interactive API documentation is available at:
 ### API Endpoints
 
 #### Authentication
-- `POST /api/v1/login` - User login (returns JWT token)
+- `POST /api/v1/login/access-token` - User login (returns JWT token)
 - `POST /api/v1/users` - Register new user
+- `GET /api/v1/users/me` - returns current user
 
 #### Tasks (Protected - Requires JWT)
 - `GET /api/v1/tasks` - List all tasks for authenticated user
@@ -302,7 +316,7 @@ Once the backend is running, interactive API documentation is available at:
 
 #### File Upload (Protected - Requires JWT)
 - `POST /api/v1/upload` - Upload a file
-- `GET /api/v1/attachments` - List all attachments
+- `GET /api/v1/attachments` - List all attachments for authenticated user
 - `DELETE /api/v1/attachments/{id}` - Delete attachment
 
 ### Authentication
@@ -322,6 +336,7 @@ Authorization: Bearer <your-jwt-token>
 With Docker Compose, the services automatically reload on code changes:
 
 ```bash
+docker-compose build
 docker-compose up
 ```
 
@@ -337,7 +352,6 @@ Uploaded files are stored in:
 - Docker: `/app/uploads` (persisted in volume)
 - Local: `backend/uploads/`
 
-Files are accessible via: `http://localhost:8000/uploads/<filename>`
 
 ### Code Structure
 
@@ -381,7 +395,7 @@ This project is created as a demonstration project.
 
 **George Mariamki**
 
-- Project: [Task Management System](https://github.com/george-mariamki/TASK-MANAGMENT-SYSTEM)
+- Project: [Task Management System](https://github.com/george-mariamki/task-managment-system)
 
 ---
 
