@@ -327,6 +327,67 @@ All protected endpoints require a JWT token in the Authorization header:
 Authorization: Bearer <your-jwt-token>
 ```
 
+### Quick Start Examples (cURL)
+
+Here are practical examples to get started with the API using cURL:
+
+#### 1. Create a New User
+
+```bash
+curl -s -X POST "http://localhost:8000/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"demo@example.com","password":"DemoPass123"}'
+```
+
+**Response:**
+```json
+{"email":"demo@example.com","is_active":true,"is_superuser":false,"id":6}
+```
+
+#### 2. Login and Get JWT Token
+
+```bash
+TOKEN=$(curl -s -X POST "http://localhost:8000/api/v1/login/access-token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=demo@example.com&password=DemoPass123" \
+  | python -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+echo "$TOKEN"
+```
+
+#### 3. Upload a File
+
+```bash
+ATTACHMENT_ID=$(curl -s -X POST "http://localhost:8000/api/v1/upload/" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@test.txt" \
+  | python -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+echo "$ATTACHMENT_ID"
+```
+
+#### 4. Create a Task with Attachment
+
+```bash
+TASK_ID=$(curl -s -X POST "http://localhost:8000/api/v1/tasks/" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"title\":\"Demo task\",\"description\":\"created from curl\",\"is_completed\":false,\"attachment_ids\":[${ATTACHMENT_ID:-}]}" \
+  | python -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+echo "$TASK_ID"
+```
+
+#### 5. List All Tasks of th Current User
+
+```bash
+curl -X 'GET' 'http://localhost:8000/api/v1/tasks/' \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'accept: application/json'
+```
+
+> 💡 **Tip**: You can also test all endpoints interactively using the Swagger UI at `http://localhost:8000/docs`
+
 ---
 
 ## 💻 Development
