@@ -53,22 +53,3 @@ def read_root():
 def healthcheck():
     return {"status": "ok"}
 
-@app.get("/debug-settings")
-def debug_settings():
-    """
-    Debug endpoint لعرض الإعدادات الحالية.
-    لا تتركيه في production.
-    """
-    return {
-        "APP_ENV": settings.APP_ENV,
-        "PROJECT_NAME": settings.PROJECT_NAME,
-        "API_V1_STR": settings.API_V1_STR,
-        "SQLALCHEMY_DATABASE_URI": settings.SQLALCHEMY_DATABASE_URI,
-        "CORS_ORIGINS": settings.CORS_ORIGINS,
-        "UPLOAD_DIR": settings.UPLOAD_DIR,
-        "UPLOAD_PUBLIC_PREFIX": settings.UPLOAD_PUBLIC_PREFIX,
-        "UPLOAD_ALLOWED_EXTENSIONS": settings.UPLOAD_ALLOWED_EXTENSIONS,
-        "UPLOAD_MAX_SIZE_BYTES": settings.UPLOAD_MAX_SIZE_BYTES,
-        "ACCESS_TOKEN_EXPIRE_MINUTES": settings.ACCESS_TOKEN_EXPIRE_MINUTES,
-        # لا نرجّع SECRET_KEY حفاظًا على الأمان
-    }
