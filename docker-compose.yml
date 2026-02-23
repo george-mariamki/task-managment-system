@@ -22,7 +22,6 @@ services:
     # environment variables: zuerst aus env_file, dann können sie hier überschrieben werden
     env_file:
       - ./backend/.env.example
-      - ./backend/.env.development
 
     # (optional) any environment variables here will override those in env_file
     environment:
@@ -46,9 +45,11 @@ services:
       - ./frontend:/app
       # prevent deletion of node_modules inside the container when bind mounting
       - /app/node_modules
-    environment:
-      # RAPID URL für den API-Zugriff vom Frontend (über den Browser)
-      - VITE_API_URL=http://localhost:8000
+    
+    # environment variables: zuerst aus env_file, dann können sie hier überschrieben werden
+    env_file:
+      - ./frontend/.env.example
+    
     depends_on:
       - backend
     networks:
