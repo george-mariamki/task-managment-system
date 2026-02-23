@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     UPLOAD_ALLOWED_EXTENSIONS: List[str] = Field(
         default_factory=lambda: [".jpg", ".jpeg", ".png", ".gif", ".pdf", ".txt", ".doc", ".docx"]
     )
-    UPLOAD_MAX_SIZE_BYTES: int = Field(default=5 * 1024 * 1024)
+    UPLOAD_MAX_SIZE_MB: int = Field(default=5)
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

@@ -42,7 +42,7 @@ def upload_file(
     stored_filename = f"{current_user.id}_{ts}_{rnd}_{original_name}"
 
     disk_path = (settings.upload_dir_abs / stored_filename).resolve()
-    max_size = int(settings.UPLOAD_MAX_SIZE_BYTES)
+    max_size = int(settings.UPLOAD_MAX_SIZE_MB * 1024 * 1024)
 
     total = 0
     try:

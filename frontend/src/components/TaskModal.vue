@@ -183,7 +183,6 @@ import { useTaskStore } from '../stores/task';
 
 const maxSizeMB = parseInt(import.meta.env.VITE_UPLOAD_MAX_SIZE_MB || '5')
 const rawExts = import.meta.env.VITE_UPLOAD_ALLOWED_EXTS || '[".jpg",".jpeg",".png",".gif",".pdf",".doc",".docx",".txt"]'
-//const allowedExts = ref(allowedExtsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean))
 
 const parseExts = (raw) => {
   if (!raw) return []
@@ -256,8 +255,6 @@ const handleFileSelect = (event) => {
   const newFiles = Array.from(event.target.files);
   
   // Konfiguration für erlaubte Dateien
-  //const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-  //const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
   const MAX_SIZE_BYTES = maxSizeMB * 1024 * 1024; // 5MB 
   const validFiles = [];
   const invalidFiles = [];
