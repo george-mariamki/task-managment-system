@@ -329,6 +329,11 @@ Authorization: Bearer <your-jwt-token>
 
 ### Quick Start Examples (cURL)
 
+> ⚠️ **Prerequisites**: Make sure the backend server is running before executing these examples:
+> ```bash
+> uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+> ```
+
 Here are practical examples to get started with the API using cURL:
 
 #### 1. Create a New User
@@ -355,7 +360,15 @@ TOKEN=$(curl -s -X POST "http://localhost:8000/api/v1/login/access-token" \
 echo "$TOKEN"
 ```
 
-#### 3. Upload a File
+#### 3. Create a Test File
+
+Before uploading, create a test file:
+
+```bash
+echo "This is a test file for upload" > test.txt
+```
+
+#### 4. Upload a File
 
 ```bash
 ATTACHMENT_ID=$(curl -s -X POST "http://localhost:8000/api/v1/upload/" \
@@ -366,7 +379,7 @@ ATTACHMENT_ID=$(curl -s -X POST "http://localhost:8000/api/v1/upload/" \
 echo "$ATTACHMENT_ID"
 ```
 
-#### 4. Create a Task with Attachment
+#### 5. Create a Task with Attachment
 
 ```bash
 TASK_ID=$(curl -s -X POST "http://localhost:8000/api/v1/tasks/" \
@@ -378,7 +391,7 @@ TASK_ID=$(curl -s -X POST "http://localhost:8000/api/v1/tasks/" \
 echo "$TASK_ID"
 ```
 
-#### 5. List All Tasks of th Current User
+#### 6. List All Tasks of th Current User
 
 ```bash
 curl -X 'GET' 'http://localhost:8000/api/v1/tasks/' \
